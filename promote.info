@@ -1,0 +1,3 @@
+name = "Promote"
+description = "Provides a promotional block for web shops to promote their company."
+core = 7.x

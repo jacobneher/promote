@@ -1,0 +1,93 @@
+<?php
+
+/**
+ * Implements hook_block_info().
+ */
+function promote_block_info() {
+  $blocks['promote'] = array(
+    'info' => 'Promote',
+    'cache'  => DRUPAL_CACHE_GLOBAL,
+  );
+  
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function promote_block_view($delta = '') {
+  switch ($delta) {
+    case 'promote':
+      $promote_text = variable_get('promote_text', 'Developed by !link');
+      $promote_link = variable_get('promote_link');
+      $promote_link_text = variable_get('promote_link_text');
+      
+      if (!empty($promote_link) && !empty($promote_link_text)) {
+        $link_html = l($promote_link_text, $promote_link);
+      }
+      
+      
+      $block['subject'] = '';
+      $block['content'] = str_replace('!link', $link_html, $promote_text);
+      
+      break;
+  }
+
+  return $block;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function promote_block_configure($delta = '') {
+  $form = array();
+  
+  switch ($delta) {
+    case 'promote':
+      $promote_text = variable_get('promote_text', 'Developed by !link');
+      $promote_link = variable_get('promote_link');
+      $promote_link_text = variable_get('promote_link_text');
+      
+      $form['promote'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Promote settings'),
+        '#tree' => 1,
+        'text' => array(
+          '#type' => 'textfield',
+          '#title' => t('Promotion text'),
+          '#description' => t('This contains the text to display on the website. Use !link where you would like the link to appear in the text.'),
+          '#default_value' => $promote_text,
+        ),
+        'link' => array(
+          '#type' => 'textfield',
+          '#title' => t('Link'),
+          '#description' => t('The website to link to in the promotion text. <strong>This must start with http:// or https://</strong>'),
+          '#default_value' => $promote_link,
+        ),
+        'link_text' => array(
+          '#type' => 'textfield',
+          '#title' => t('Link Text'),
+          '#description' => t('The clickable text for the given link.'),
+          '#default_value' => $promote_link_text,
+        ),
+      );
+      
+      break;
+  }
+  
+  return $form;
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function promote_block_save($delta = '', $edit = array()) {
+  switch ($delta) {
+    case 'promote':
+      variable_set('promote_text', $edit['promote']['text']);
+      variable_set('promote_link', $edit['promote']['link']);
+      variable_set('promote_link_text', $edit['promote']['link_text']);
+      
+      break;
+  }
+}
